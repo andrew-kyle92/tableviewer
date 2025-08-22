@@ -1,0 +1,18 @@
+# venv
+env/
+
+# pycharm
+.idea
+
+# django
+core/settings.py
+*/*/__pycache__
+*/__pycache__
+
+# static/media
+media/logos/*
+media/table_files/*
+
+static/webpack/node_modules
+
+

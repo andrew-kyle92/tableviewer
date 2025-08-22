@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h3 class="border-bottom mb-3">All Tables</h3>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-primary">
+            <tr>
+                <th>Table Name</th>
+                <th>Description</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody class="table-group-divider">
+            {% for table in object_list %}
+                <tr>
+                    <td>{{ table.name }}</td>
+                    <td>{{ table.description }}</td>
+                    <td><a class="link-primary" href="{% url 'tableviewer:table-detail' pk=table.id %}">View</a> | <a class="link-primary" href="{% url 'tableviewer:table-view' table_id=table.id %}" target="_blank">Preview</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

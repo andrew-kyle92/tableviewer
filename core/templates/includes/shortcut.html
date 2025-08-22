@@ -1,0 +1,14 @@
+{% load tableviewer_extras %}
+<div class="input-group mb-3">
+    <span class="input-group-text">{{ domain_name }}</span>
+    <p class="my-auto mx-1">/</p>
+    {% for path in shortcut.url|split_path %}
+        <span class="input-group-text">{{ path }}</span>
+        {% if not forloop.last %}
+        <p class="my-auto mx-1">/</p>
+        {% endif %}
+    {% endfor %}
+    {# copy and delete buttons #}
+    <button id="shortcut-{{ shortcut.id }}" class="copy-url-btn btn btn-outline-secondary" title="copy url" data-url-id="{{ shortcut.id }}" data-link="{{ shortcut.url|get_copy_url }}"><i class="fa-solid fa-copy"></i></button>
+    <button class="delete-url-btn btn btn-outline-secondary" title="remove url" data-url-id="{{ shortcut.id }}"><i class="fa-solid fa-trash"></i></button>
+</div>

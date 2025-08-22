@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {# top section: name,department #}
+    <div id="top-section" class="mb-4">
+        <div class="d-flex justify-content-between mb-3 border-bottom">
+            <h3 class="mb-0">Group: {{ group.name }}</h3>
+            <a class="text-decoration-none" href="{% url 'administration:edit-group' pk=group.pk %}">Edit</a>
+        </div>
+        <table class="table">
+            <tr>
+                <td class="w-25 fw-bold">Name:</td>
+                <td>{{ group.name }}</td>
+            </tr>
+            <tr>
+                <td class="w-25 fw-bold">Department:</td>
+                <td>{{ group.department }}</td>
+            </tr>
+        </table>
+    </div>
+
+    {# middle section: members,owners,tables #}
+    <div id="tabs">
+        {# tab nav-links #}
+        <ul class="nav nav-tabs mb-3">
+            <li class="nav-item">
+                <a id="tabBtn1" role="button" class="tab-btn nav-link active" aria-current="true" data-target="tab1">Members</a>
+            </li>
+            <li class="nav-item">
+                <a id="tabBtn2" role="button" class="tab-btn nav-link" aria-current="false" data-target="tab2">Owners</a>
+            </li>
+            <li class="nav-item">
+                <a id="tabBtn3" role="button" class="tab-btn nav-link" aria-current="false" data-target="tab3">Tables</a>
+            </li>
+        </ul>
+
+        {# tab contents #}
+        {# tab 1 content #}
+        <div id="tab1" class="tab-content" data-hidden="false">
+            <table id="membersTable" class="table table-striped table-bordered">
+                <thead class="table-primary">
+                    <tr>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                {% for member in group.members.all %}
+                    <tr id="member-{{ member.pk }}">
+                        <td>{{ member.first_name }}</td>
+                        <td>{{ member.last_name }}</td>
+                        <td class="d-flex justify-content-evenly">
+                            <a role="button" class="member-remove-btn text-danger {% if member in group.owners.all %}disabled{% endif %}"
+                               data-member-id="{{ member.pk }}"
+                               title="{% if member in group.owners.all %}Can't remove because the member is an owner.&#013;To remove from group, remove them from the owners tab.{% else %}Remove member{% endif %}"
+                               ><i class="fa-solid fa-square-minus"></i></a>
+                            {% if not member in group.owners.all %}
+                            |
+                            <a role="button" class="upgrade-to-owner-btn text-success" data-member-id="{{ member.pk }}" title="Make owner"><i class="fa-solid fa-arrow-up-from-bracket"></i></a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot class="table-group-divider">
+                    <tr class="memberAddDiv">
+                        <td class="position-relative"><input id="memberFirstName" aria-label="first_name" class="form-control local-autocomplete" type="text" placeholder="First name" data-type="user" data-filter="first_name"></td>
+                        <td class="position-relative"><input id="memberLastName" aria-label="last_name" class="form-control local-autocomplete" type="text" placeholder="Last name" data-type="user" data-filter="last_name"></td>
+                        <td><a id="memberAddBtn" role="button" class="btn btn-secondary" title="Add member"><i class="fa-solid fa-plus"></i></a></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        {# tab2 #}
+        <div id="tab2" class="tab-content hidden" data-hidden="true">
+            <table id="ownersTable" class="table table-striped table-bordered mb-0">
+                <thead class="table-primary">
+                    <tr>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                {% for owner in group.owners.all %}
+                    <tr id="owner-{{ owner.pk }}">
+                        <td>{{ owner.first_name }}</td>
+                        <td>{{ owner.last_name }}</td>
+                        <td class="d-flex justify-content-evenly"><a role="button" class="owner-remove-btn text-danger" data-owner-id="{{ owner.pk }}" title="Remove owner"><i class="fa-solid fa-square-minus"></i><span class="tooltiptext">Remove from member's list too? <input type="checkbox" aria-label="member remove"><br><button type="button">Remove</button></span></a></td></tr>
+                {% endfor %}
+                </tbody>
+                <tfoot class="table-group-divider">
+                    <tr id="ownerAddDiv">
+                        <td class="position-relative"><input id="ownerFirstName" aria-label="first_name" class="form-control local-autocomplete" type="text" placeholder="First name" data-type="user" data-filter="first_name" autocomplete="off"></td>
+                        <td class="position-relative"><input id="ownerLastName" aria-label="last_name" class="form-control local-autocomplete" type="text" placeholder="Last name" data-type="user" data-filter="last_name" autocomplete="off"></td>
+                        <td><a id="ownerAddBtn" role="button" class="btn btn-secondary"><i class="fa-solid fa-plus"></i></a></td>
+                    </tr>
+                </tfoot>
+            </table>
+            <p class="important-text">Owners are automatically added to the members list.</p>
+        </div>
+
+        {# tab3 #}
+        <div id="tab3" class="tab-content hidden" data-hidden="true">
+            <table id="tablesTable" class="table table-striped table-bordered">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Name</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                {% for table in group.tables.all %}
+                    <tr id="table-{{ table.pk }}">
+                        <td><a href="{% url 'tableviewer:table-detail' pk=table.pk %}">{{ table.name }}</a></td>
+                        <td class="d-flex justify-content-evenly"><a role="button" class="table-remove-btn text-danger" data-table-id="{{ table.pk }}" title="Remove table"><i class="fa-solid fa-square-minus"></i></a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot class="table-group-divider">
+                    <tr id="tableAddDiv">
+                        <td class="position-relative"><input id="tableName" aria-label="table_name" class="form-control local-autocomplete" type="text" placeholder="Table name" data-type="table" data-filter="name"></td>
+                        <td><a id="tableAddBtn" role="button" class="btn btn-secondary"><i class="fa-solid fa-plus"></i></a></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+{% endblock %}

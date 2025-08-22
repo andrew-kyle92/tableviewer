@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{# changing the column sizes #}
+{% block left_col_size %}col-3{% endblock %}
+{% block middle_col_size %}col-6{% endblock %}
+{% block right_col_size %}col-3{% endblock %}
+
+{% block content %}
+	<div class="formDiv">
+        <div id="formHeader" class="d-flex justify-content-between mb-3 border-bottom">
+            {% if action == "add" %}
+                <h3 class="mb-0">Add new group</h3>
+            {% else %}
+                <h3 class="mb-0">Edit group: {{ instance.name }}</h3>
+            {% endif %}
+        </div>
+
+        <form id="siteGroupForm" method="post" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <ul>
+                    {% for error in form.non_field_errors %}
+                        <li class="form-error">{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            {% for field in form %}
+                <div class="form-group mb-3">
+                    <label class="form-label" for="{{ field.name }}">{{ field.label }}</label>
+                    {{ field }}
+
+                    {% if field.errors %}
+                        <div class="field-errors">
+                        {% for error in field.errors %}
+                            <p class="field-error">{{ error }}</p>
+                        {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <div class="input-group">
+                <button class="btn btn-primary" type="submit">{% if action == "add" %}Add group{% else %}Save{% endif %}</button>
+                <a class="btn btn-secondary text-decoration-none" role="button" href="{% if action == 'add' %}{% url 'administration:groups' %}{% else %}{% url 'administration:view-group' pk=instance.pk %}{% endif %}">Cancel</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}

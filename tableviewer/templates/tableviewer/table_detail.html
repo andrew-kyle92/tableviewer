@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% load tableviewer_extras %}
+
+{% block alert_banner %}
+    {% if not object.settings.published %}
+        {% include 'includes/top-banner.html' with banner=banner %}
+    {% endif %}
+{% endblock %}
+
+
+{% block content %}
+    <div id="flash-messages" class="w-50">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.level_tag }}" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <div class="content-top d-flex flex-wrap justify-content-between border-bottom mb-4">
+        <h3>{{ object.name }}</h3>
+        <div>
+            <a class="btn btn-primary" href="{% url 'tableviewer:edit-table' pk=object.id %}">Edit</a>
+            <a class="btn btn-secondary" href="#table-view">View</a>
+        </div>
+    </div>
+
+    <div id="tabs">
+        {# tab nav-links #}
+        <ul class="nav nav-tabs mb-3">
+            <li class="nav-item">
+                <a id="tabBtn1" role="button" class="tab-btn nav-link active" aria-current="true" data-target="tab1">Details</a>
+            </li>
+            <li class="nav-item">
+                <a id="tabBtn2" role="button" class="tab-btn nav-link" aria-current="false" data-target="tab2">Settings</a>
+            </li>
+        </ul>
+
+        {# tab contents #}
+        {# tab 1 content #}
+        <div id="tab1" class="tab-content" data-hidden="false">
+            <div id="table-detail" class="mb-5">
+                <table class="table">
+                    <tr>
+                        <td class="fw-bold">Description</td>
+                        <td>{{ object.description }}</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">File</td>
+                        <td>{{ object.table_file }}</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Updated At</td>
+                        <td>{{ object.updated_at }}</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Created At</td>
+                        <td>{{ object.created_at }}</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Results Shown in Table</td>
+                        <td>{{ object.results_shown }}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div id="csv-data" class="mb-5">
+                <div class="auto-generated-columns">
+                    <div class="d-flex flex-row justify-content-between border-bottom mb-3 align-center">
+                        <h3>Table Headers</h3>
+                        <button title="regenerate columns" class="border-0 btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#regenerateHeaderModal"><i class="fa-solid fa-rotate-right"></i></button>
+                    </div>
+
+                    <table class="table table-bordered table-light table-striped align-middle">
+                        <thead class="table-primary">
+                            <tr>
+                                <td>Active</td>
+                                <td>Auto-generated column names</td>
+                                <td>Custom column names</td>
+                                <td>Action</td>
+                            </tr>
+                        </thead>
+                        <tbody class="table-group-divider">
+                            {% for column in object.columns.all %}
+                            <tr id="column-{{ column.id }}" data-table-editing="false">
+                                <td>{{ column.use_column }}</td>
+                                <td>{{ column.name }}</td>
+                                <td>{{ column.label }}</td>
+                                <td><button class="column-edit-btn btn btn-outline-secondary btn-sm" data-column-data="{{ column.to_json }}" type="button">Edit</button></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="table-view" class="mb-5">
+                <div id="table-view-content">
+                    <div class="d-flex justify-content-between border-bottom mb-3 align-middle">
+                        <h3>Table Preview</h3>
+                        <a class="link-primary" href="{% url 'tableviewer:table-view' table_id=object.id %}?preview=true" target="_blank">Preview in new window</a>
+                    </div>
+                    <div id="table-preview" class="iframe-container">
+                        <iframe id="table-preview-iframe" class="responsive-iframe" src="{% url 'tableviewer:table-view' table_id=object.id %}?preview=true"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# tab 2 content #}
+        <div id="tab2" class="tab-content hidden" data-hidden="true">
+            {# settings #}
+            <div class="mb-5">
+                <div class="d-flex flex-wrap justify-content-between border-bottom mb-3 align-middle">
+                    <h3 class="mb-0">Settings</h3>
+                    <button id="settings-save-btn" class="btn btn-primary btn-sm" data-settings="{{ object.settings.pk }}">Save</button>
+                </div>
+                <table id="settings-table" class="table">
+                    <tbody>
+                        <tr>
+                            <td style="width: fit-content;"><strong>Table published</strong>:</td>
+                            <td><input aria-label="published" id="publishedInput" data-value-changed="false" data-current-value="{{ object.settings.published|lower }}" type="checkbox" class="form-check table-setting" {% if object.settings.published %}checked{% endif %}></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            {# urls #}
+            <div id="urls-div">
+                <h3 class="border-bottom mb-3">URLs</h3>
+                <div id="urls">
+                    {# permanent URL #}
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">{{ domain_name }}</span>
+                        <p class="my-auto mx-1">/</p>
+                        <span class="input-group-text">tables</span>
+                        <p class="my-auto mx-1">/</p>
+                        <span class="input-group-text">view</span>
+                        <p class="my-auto mx-1">/</p>
+                        <span class="input-group-text">{{ object.id }}</span>
+                        <button class="copy-url-btn btn btn-outline-secondary" title="copy url" data-url-id="{{ shortcut.id }}" data-link="{{ domain_name }}/tables/view/{{ object.id }}"><i class="fa-solid fa-copy"></i></button>
+                    </div>
+
+                    {# URL shortcuts #}
+                    <div id="url-shortcuts">
+                        {% for shortcut in object.shortcuts.all %}
+                            {% include 'includes/shortcut.html' with domain_name=domain_name shortcut=shortcut %}
+                        {% endfor %}
+                    </div>
+
+                    {# add shortcut button #}
+                    <div class="input-group w-75">
+                        <span class="input-group-text">{{ domain_name }}</span>
+                        <p class="my-auto mx-1">/</p>
+                        <input id="new-url" aria-label="new-shortcut" class="form-control" type="text">
+                        <button id="add-url-btn" type="button" class="btn btn-outline-secondary" title="add url shortcut" data-table-id="{{ object.id }}"><i class="fa-solid fa-plus"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block modal_content %}
+	<!-- Regenerate Headers Modal -->
+<div class="modal fade" id="regenerateHeaderModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="regenerateHeaderModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="regenerateHeaderModalLabel">Regenerate Headers</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+        <div class="modal-body">
+            <h3>Warning</h3>
+            <p>Regenerating the column headers will reset the active and label columns.</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button id="regenerate-columns-btn" type="button" class="btn btn-primary" data-table-id="{{ object.id }}">Understood</button>
+        </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="login text-center">
+    {% if messages %}
+    <div id="liveAlertPlaceholder" class="messages w-25">
+        {% for message in messages %}
+        <div class="alert alert-dismissible {% if message.tags == "success" %}alert-success{% else %}alert-warning{% endif %}">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div id="login-div" class="w-50 m-auto text-start">
+
+        <h4 class="mb-0 text-start">City Network Login (AD)</h4>
+        <p class="mb-4 font-italic">Use the same username and password you use to log into your work computer.</p>
+
+        {% if form.non_field_errors %}
+            {% for error in form.non_field_errors %}
+                <span class="error-msg">{{ error }}</span>
+            {% endfor %}
+        {% endif %}
+
+        <form id="form" class="login-form" action="{% url 'tableviewer:login' %}?next={{ next }}" method="post" novalidate>
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group my-2">
+                <label for="{{ field.name }}" class="form-label">{{ field.label }}</label>
+                {% if field.name == "password" %}
+                    <div class="input-group">
+                        {{ field }}
+                        <button id="eye-btn" class="btn btn-outline-secondary" type="button" data-status="hidden"><i class="fa-solid fa-eye"></i></button>
+                    </div>
+                    {% if field.help_text %}
+                        <div>
+                        <div class="form-text">{{ field.help_text }}</div>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    {{ field }}
+                    {% if field.help_text %}
+                        <div>
+                        <div class="form-text">{{ field.help_text }}</div>
+                        </div>
+                    {% endif %}
+                {% endif %}
+
+                {% if field.errors %}
+                <span class="error">{{ field.errors }}</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+            <div class="btn-group mt-2">
+                <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

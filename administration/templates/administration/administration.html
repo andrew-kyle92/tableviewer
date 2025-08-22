@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load administration_extras %}
+
+{% block content %}
+    <h3 class="border-bottom mb-3">Administration</h3>
+
+    <div class="mb-5">
+        <p>Administer users and groups here. Choose a tab for the relevant list to view or edit.</p>
+    </div>
+
+    <div id="tabs">
+        {# tab nav-links #}
+        <ul class="nav nav-tabs mb-3">
+            <li class="nav-item">
+                <a id="tabBtn1" role="button" class="tab-btn nav-link active" aria-current="true" data-target="tab1">Users</a>
+            </li>
+            <li class="nav-item">
+                <a id="tabBtn2" role="button" class="tab-btn nav-link" aria-current="false" data-target="tab2">Groups</a>
+            </li>
+            <li class="nav-item">
+                <a id="tabBtn3" role="button" class="tab-btn nav-link" aria-current="false" data-target="tab3">Tables</a>
+            </li>
+        </ul>
+
+        {# tab contents #}
+        {# tab 1 content #}
+        <div id="tab1" class="tab-content" data-hidden="false">
+            <div class="mb-3 border-bottom d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">Users</h3>
+                <a href="{% url 'administration:add-user' %}">Add User</a>
+            </div>
+            <table id="membersTable" class="table table-bordered table-striped">
+                <thead class="table-primary">
+                    <tr>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Groups</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>{{ user.first_name }}</td>
+                        <td>{{ user.last_name }}</td>
+                        <td>{{ user.group_memberships.all|format_list:"name" }}</td>
+                        <td><a href="#view-user">View</a> | <a href="#edit-user">Edit</a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {# tab 2 content #}
+        <div id="tab2" class="tab-content hidden" data-hidden="true">
+            <div class="mb-3 border-bottom d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">Groups</h3>
+                <a class="link-primary" href="{% url 'administration:add-group' %}">Add new group</a>
+            </div>
+            <table id="ownersTable" class="table table-bordered table-striped">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Group Name</th>
+                        <th>Department</th>
+                        <th>Members</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for group in groups %}
+                    <tr>
+                        <td>{{ group.name }}</td>
+                        <td>{{ group.department }}</td>
+                        <td>{{ group.members.all|format_list:"username" }}</td>
+                        <td><a href="{% url 'administration:view-group' pk=group.pk %}">View</a> | <a href="{% url 'administration:edit-group' pk=group.pk %}">Edit</a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {# tab 3 content #}
+        <div id="tab3" class="tab-content hidden" data-hidden="true">
+            <div class="mb-3 border-bottom d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">Tables</h3>
+                <a href="{% url 'tableviewer:new-table' %}">Add new table</a>
+            </div>
+            <table id="tablesTable" class="table table-bordered table-striped">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Table Name</th>
+                        <th>Department</th>
+                        <th>Member Of</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for table in tables %}
+                    <tr>
+                        <td>{{ table.name }}</td>
+                        <td>{{ table.description }}</td>
+                        <td>{{ table.group_tables.all|format_list:"name" }}</td>
+                        <td><a href="{% url 'tableviewer:table-detail' pk=table.pk %}">View</a> | <a href="{% url 'tableviewer:edit-table' pk=table.pk %}">Edit</a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{# blocking out header #}
+{% block header %}{% endblock %}
+
+{# rewriting the main content #}
+{% block main %}
+    {% if "search-table" in request.path %}
+        <a class="link-primary ms-4" href="{% url 'tableviewer:table-view' table_id=table.id %}">Back to table</a>
+    {% endif %}
+	<div class="m-auto">
+        <div class="row my-3">
+            <div  class="d-flex col-3 align-items-center justify-content-center">
+                <h4 class="mb-0">{{ table.name }}</h4>
+            </div>
+            <div id="searchDiv" class="d-flex align-items-center flex-grow-1 col-6">
+                <input class="form-control me-2" name="s" type="text" id="searchInput" placeholder="Search..." aria-label="Search">
+                <select class="form-select me-2" name="c" id="searchSelect" aria-label="Columns">
+                    <option value="">--Choose a column--</option>
+                    {% for header in table_data.columns %}
+                    <option value="{{ header }}">{{ header }}</option>
+                    {% endfor %}
+                </select>
+                <button id="searchBtn" class="btn btn-primary" data-table="{{ table.id }}" type="button">Search</button>
+            </div>
+        <div class="col-3">
+            {% if table.logo %}
+            <img class="img-fluid" src="{{ table.logo.url }}" alt="table-logo">
+            {% endif %}
+        </div>
+        </div>
+
+        {# before table text #}
+        <div class="before-table-text mx-5">
+            {{ table.before_table_text|safe }}
+        </div>
+
+        <div id="mainTable">
+            <table class="table table-striped table-bordered table-responsive-sm">
+                <thead class="table-primary">
+                    {% for column in table.get_active_columns %}
+                    <th>{{ column }}</th>
+                    {% endfor %}
+                </thead>
+                <tbody class="table-group-divider">
+                {% for row in page_obj.object_list %}
+                    <tr>
+                    {% for k, v in row.items %}
+                        <td class="table-column-{{ k }}" data-column-data='{"{{ k }}": "{{ v }}"'>{{ v }}</td>
+                    {% endfor %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination m-auto align-content-center btn-group text-center w-50" role="group">
+            {% if page_obj.has_previous %}
+                <a class="btn btn-outline-secondary" href="?{% if is_preview %}preview=true&{% endif %}page={{ page_obj.previous_page_number }}{% if url_params is not None %}&{{ url_params }}{% endif %}"><i class="fa-solid fa-angles-left"></i></a>
+            {% else %}
+                <a class="btn btn-outline-secondary disabled" href="#"><i class="fa-solid fa-angles-left"></i></a>
+            {% endif %}
+
+            {% if page_obj.number|add:'-4' > 1 %}
+                <a role="button" class="btn btn-outline-secondary" href="?{% if is_preview %}preview=true&{% endif %}page={{ page_obj.number|add:'-5' }}{% if url_params is not None %}&{{ url_params }}{% endif %}">&hellip;</a>
+            {% endif %}
+
+            {% for i in page_obj.paginator.page_range %}
+                {% if page_obj.number == i %}
+                    <a class="btn btn-outline-secondary active" role="button" href="?{% if is_preview %}preview=true&{% endif %}page={{ page_obj.number }}{% if url_params is not None %}&{{ url_params }}{% endif %}">{{ i }}</a>
+                {% elif i > page_obj.number|add:'-5' and i < page_obj.number|add:'5' %}
+                    <a class="btn btn-outline-secondary" role="button" href="?{% if is_preview %}preview=true&{% endif %}page={{ i }}{% if url_params is not None %}&{{ url_params }}{% endif %}">{{ i }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.paginator.num_pages > page_obj.number|add:'4' %}
+                <a role="button" class="btn btn-outline-secondary" href="?{% if is_preview %}preview=true&{% endif %}page={{ page_obj.number|add:'5' }}{% if url_params is not None %}&{{ url_params }}{% endif %}">&hellip;</a>
+            {% endif %}
+
+            {% if page_obj.has_next %}
+                <a class="btn btn-outline-secondary" href="?{% if is_preview %}preview=true&{% endif %}page={{ page_obj.next_page_number }}{% if url_params is not None %}&{{ url_params }}{% endif %}"><i class="fa-solid fa-angles-right"></i></a>
+            {% else %}
+                <a class="btn btn-outline-secondary disabled" href="#"><i class="fa-solid fa-angles-right"></i></a>
+            {% endif %}
+        </div>
+        {# For List view pagination status; 1 of 10 #}
+        {% if page_obj %}
+            <div class="pagination-status text-end me-5">
+                <p>{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</p>
+            </div>
+        {% endif %}
+
+        {# after table text #}
+        <div class="after-table-text mx-5">
+            {{ table.after_table_text|safe }}
+        </div>
+    </div>
+{% endblock %}

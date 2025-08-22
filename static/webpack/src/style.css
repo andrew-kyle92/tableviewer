@@ -1,0 +1,150 @@
+.owner-remove-btn {
+    position: relative;
+}
+
+.owner-remove-btn .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  top: -5px;
+  left: 110%;
+}
+
+.owner-remove-btn .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  margin-top: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent black transparent transparent;
+}
+.owner-remove-btn:hover .tooltiptext {
+  visibility: visible;
+}
+
+.important-text {
+    color: red;
+    font-style: italic;
+}
+
+.disabled {
+    cursor: not-allowed;
+}
+
+.current-value {
+    color: #747474;
+    font-size: 15px;
+}
+
+@keyframes success {
+    0% {background-color: inherit;}
+    25% {background-color: #006b1b;}
+    75% {background-color: inherit;}
+}
+
+.flash-success {
+    background-color: inherit;
+    animation-name: success;
+    animation-duration: 0.5s;
+    animation-iteration-count: 1;
+}
+
+.fade-out {
+    opacity: 0;
+    transition: all 1s linear;
+}
+
+.iframe-container {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 Aspect Ratio (divide 9 by 16 = 0.5625) */
+}
+
+/* Then style the iframe to fit in the container div with full height and width */
+.responsive-iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.form-section-title {
+    background-color: #6c757d;
+}
+
+.hidden {
+    display: none;
+}
+
+/* ********** Autocomplete ********** */
+.readonly {
+  background-color: #e9ecef;
+  opacity: 1;
+  cursor: not-allowed;
+}
+
+#autocomplete-div {
+  background: #fff;
+  border: #AFB8D0 solid;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  max-height: 200px;
+  position: absolute;
+  z-index: 1;
+}
+
+.autocomplete-item {
+  font-size: 18px;
+  padding: 1px 4px;
+}
+
+.autocomplete-item:hover {
+  background: #444;
+  color: #fff;
+  cursor: pointer;
+}
+
+.focused-option {
+  background-color: #444;
+  color: #fff;
+}
+
+#usersDiv {
+  background: var(--bs-light);
+  border-radius: 0.5em;
+  display: flex;
+  flex-direction: column;
+  padding: 0.3rem;
+  position: absolute;
+  width: 75%;
+}
+
+.user-dropdown-item {
+  border-radius: 0.2em;
+  color: var(--bs-dark);
+  padding: 0.2rem;
+}
+
+.user-dropdown-item:hover {
+  background: var(--bs-dark);
+  color: var(--bs-light);
+}
+
+.active-item {
+  background: var(--bs-gray-800);
+  color: var(--bs-light);
+}

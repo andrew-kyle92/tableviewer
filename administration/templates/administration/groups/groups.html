@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div id="groupsDiv">
+        <div id="groupsHeaderDiv" class="d-flex justify-content-between border-bottom my-4">
+            <h4 class="mb-0">My groups</h4>
+            <a class="text-decoration-none" href="{% url 'administration:add-group' %}">Add group</a>
+        </div>
+        <div id="groupsTable">
+            <table class="table table-striped table-bordered">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Name</th>
+                        <th>action</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    {% for group in user_groups %}
+                        <tr>
+                            <td>{{ group.name }}</td>
+                            <td><a href="{% url 'administration:view-group' pk=group.pk %}">View</a> | <a href="{% url 'administration:edit-group' pk=group.pk %}">Edit</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if user_groups|length < 1 %}
+                <p class="fs-4 text-center">No groups exist. Add a new group to view them here.</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
